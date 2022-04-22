@@ -1,0 +1,63 @@
+---
+title: "Flipped Assignment 17"
+author: "Group 5"
+date: "2022/4/21"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(MASS)
+library(tibble)
+library(car)
+library(dplyr)
+library(ggplot2)
+```
+
+## Input Data and Function Definition
+```{r setup1, echo=TRUE}
+setwd('G:/OneDrive - Texas Tech University/IE 5344 Statistical Data Analysis/Flipped Assignment 17')
+data_1 <- read.csv('data-13-1.csv', header = TRUE)
+data_3 <- read.csv('data-13-3.csv', header = TRUE)
+head(data_1)
+head(data_3)
+```
+
+## 13.1
+```{r 1, echo=TRUE}
+fit_1 <- glm(y~x, data_1, family = binomial())
+summary(fit_1)
+predict(fit_1,data.frame(x=c(350)), type='response')
+```
+
+So, the expected probability of a hit when the target speed is 350 knots is 0.4686013.
+
+## 13.3
+```{r 3, echo=TRUE}
+Failure <- data_3$r
+n <- data_3$n
+Success <- n - Failure
+data_3$s <- Success
+fit_2 <- glm(cbind(Failure, Success) ~ x, data_3, family = binomial())
+summary(fit_2)
+```
+
+### Part a.
+```{r 3a, echo=TRUE}
+predict(fit_2,data.frame(x=c(3500)),type = 'response')
+```
+
+So, the expected probability that a fastener will fail under a load of 3500psi is 0.519941.
+
+### Part b.
+```{r 3b, echo=TRUE}
+p <- predict(fit_2, data.frame(x = c(4000)), type = 'response')
+p
+Pr_10 <- pbinom(10, size=25, prob = p)
+Pr_10
+Pr_18 <- pbinom(18, size=25, prob = p)
+Pr_18
+
+```
+
+In a sample of 25 fasteners at 4000 psi, the expected probability that 10 or less will fail is 0.001687081.
