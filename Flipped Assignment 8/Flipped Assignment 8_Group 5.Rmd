@@ -1,0 +1,195 @@
+---
+title: "Flipped Assignment 9"
+author: "Group 5"
+date: "2/24/2022"
+output: 
+  pdf_document: 
+    keep_tex: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(MASS)
+library(tibble)
+```
+
+# Input Data
+```{r setup1, echo=TRUE}
+setwd('G:/OneDrive - Texas Tech University/IE 5344 Statistical Data Analysis/Flipped Assignment 9')
+data <- read.csv('data-table-B8.csv', header = TRUE)
+head(data)
+#colnames(data) <- c('x1', 'x2', 'y')
+```
+
+# Part a.
+
+## Fitting the Model
+
+```{r a1, echo=TRUE}
+fit1 <- lm(y ~ x1 + x2 + x3 + x4 + x1:x2 + x1:x3 + x1:x4 + x2:x3 + x2:x4 + x3:x4, data)
+summary(fit1)
+```
+Here, two interactions, $x_1x_3$ and $x_2x_3$ are dropped because of multicollinearity. So, 
+
+$\hat{y} = 15.88376 + 0.18696x_1 + 0.37921x_2 - 11.99940x_3 - 8.86442x_4 + 0.01155x_1x_2 - 1.11525x_1x_4 - 0.38547x_2x_4 + 72.85976x_3x_4$. $R^2$ is $0.7496$ and the adjusted one is $0.7118$.
+
+## Checking for Model Adequacy
+
+```{r a21, echo=TRUE, fig.width = 3.5, fig.height=3.5}
+plot(fit1,1)
+```
+
+This figure ensures the constant variance for we cannot see any patterns. 
+
+```{r a22, echo=TRUE, fig.width = 3.5, fig.height=3.5}
+plot(fit1,2)
+```
+
+This figure ensures the normality for the line is almost straight. 
+
+```{r a23, echo=TRUE, fig.width = 3.5, fig.height=3.5}
+plot(fit1,3)
+```
+
+We don't think there is any outliers in this figure. 
+
+```{r a24, echo=TRUE, fig.width = 3.5, fig.height=3.5}
+plot(fit1,5)
+```
+
+Also, we don't think there is any outliers in this figure.
+
+Thus, we think this model has model adequacy.
+
+## Test of Significance of the Full Regression Model
+```{r a3, echo=TRUE}
+X <- add_column(data, x0 = rep(1,nrow(data)), .before = 'x1')
+X <- cbind(X, data$x1*data$x2, data$x1*data$x4, data$x2*data$x4, data$x3*data$x4)
+X <- X[,-c(6)]
+Y <- data$y
+SST <- t(Y)%*%Y - (sum(Y)^2)/nrow(data)
+beta <- na.omit(fit1$coefficients)
+SSE <- t(Y)%*%Y - t(as.vector(beta))%*%t(X)%*%Y
+SSR <- SST - SSE
+MSR <- SSR/(length(beta) - 1)
+MSE <- SSE/(nrow(data) - length(beta))
+f <- MSR/MSE
+pvalue <- 1 - pf(f,length(beta) - 1, nrow(data) - length(beta))
+pvalue
+f
+```
+
+Reject $H_0$ because $p-value < 0.001$. So, we conclude that at least one of these regressors contributes significantly to the model, which implies that the pressure drop in a screen plate bubble column is related to at least of these factors. (This can be seen directly from the summary table of this model.)
+
+# Part b. 
+
+## Reducecd Model
+
+```{r breducedmodel, echo=TRUE}
+fit1 <- lm(y~x1+x2+x3+x4+x1:x2+x1:x4+x2:x4+x3:x4,data)
+fit2 <- lm(y~x1+x2+x3+x4,data)
+```
+
+## Test of Significance of the interactions
+
+```{r breducedmodel2, echo=TRUE}
+anova(fit2,fit1)
+X2 <- add_column(data, x0 = rep(1,nrow(data)), .before = 'x1')
+X2 <- X2[,-c(6)]
+beta2 <- as.vector(fit2$coefficients)
+SSRreduced <- t(beta2)%*%t(X2)%*%Y - (sum(Y)^2)/nrow(data)
+fpartial <- ((SSR-SSRreduced)/(length(beta)-length(beta2)))/MSE
+fpartial
+pvaluepartial <- 1 - pf(fpartial,length(beta) - length(beta2), nrow(data) - length(beta))
+pvaluepartial
+```
+Reject $H_0$ because $p-value < 0.05$. We conclude that at least one of these interactions contributes significantly to the model.
+
+# Part c. Finding the Best Model
+
+## Test $x_3x_4$
+
+```{r bbestmodel1, echo=TRUE}
+fit3 <- lm(y~x1+x2+x3+x4+x1:x2+x1:x4+x2:x4,data)
+anova(fit3, fit1)
+```
+
+Don't reject $H_0$ because $p-value > 0.05$. So we drop $x_3x_4$.
+
+## Test $x_2x_4$
+
+```{r bbestmodel2, echo=TRUE}
+fit4 <- lm(y~x1+x2+x3+x4+x1:x2+x1:x4,data)
+anova(fit4, fit3)
+```
+
+Reject $H_0$ because $p-value < 0.05$. So we keep $x_2x_4$.
+
+## Test $x_1x_4$
+
+```{r bbestmodel3, echo=TRUE}
+fit5 <- lm(y~x1+x2+x3+x4+x1:x2+x2:x4,data)
+anova(fit5, fit3)
+```
+
+Don't reject $H_0$ because $p-value > 0.05$. So we drop $x_1x_4$.
+
+## Test $x_1x_2$
+
+```{r bbestmodel4, echo=TRUE}
+fit6 <- lm(y~x1+x2+x3+x4+x2:x4,data)
+anova(fit6, fit5)
+```
+
+Don't reject $H_0$ because $p-value > 0.05$. So we drop $x_1x_2$. 
+
+## Test $x_1$
+
+```{r bbestmodel5, echo=TRUE}
+fit7 <- lm(y~x2+x3+x4+x2:x4,data)
+anova(fit7, fit6)
+```
+
+Don't reject $H_0$ because $p-value > 0.05$. So we drop $x_1$.
+
+## Test $x_3$
+
+```{r bbestmodel6, echo=TRUE}
+fit8 <- lm(y~x2+x4+x2:x4,data)
+anova(fit8, fit7)
+```
+
+Reject $H_0$ because $p-value > 0.05$. So we keep $x_3$. 
+
+## The Best Fitting
+
+```{r bbestmodel7, echo=TRUE}
+fitbest <- lm(y~x2+x3+x4+x2:x4,data)
+summary(fitbest)
+```
+
+The best fitting is $\hat{y} = 1.52261 + 0.38056x_2 + 34.51062x_3+9.52471x_4 - 0.30472x_2x_4$. The $R^2$ is 0.7336 and the adjusted one is $0.7149$. We don't think there exists a significant difference between the best fitting and the original one.
+
+# Part d. Confidence Interval
+
+```{r CI, echo=TRUE}
+newx1 <- c(5.0, 10.0)
+newx2 <- c(10.0, 3.0)
+newx3 <- c(0.5, 0.25)
+newx4 <- c(0.75, 0.85)
+CI <- predict(fitbest, data.frame(x1 = newx1, x2 = newx2, 
+                                  x3 = newx3, x4 = newx4), interval='confidence')
+CI
+```
+
+So, CI for the first point is $(24.00618, 30.87717)$ and that for the second point is $(15.76975, 21.45208)$.
+
+# Part e. Prediction Interval
+
+```{r PI, echo=TRUE}
+PI <- predict(fitbest, data.frame(x1 = newx1, x2 = newx2, 
+                                  x3 = newx3, x4 = newx4), interval='prediction')
+PI
+```
+
+So, PI for the first point is $(17.501496,37.38186)$ and that for the second point is $(8.860183, 28.36165)$.
