@@ -1,0 +1,56 @@
+---
+title: "Flipped Assignment 12"
+author: "Group 5"
+date: "2022/3/29"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(MASS)
+library(tibble)
+library(car)
+```
+
+## Input Data
+```{r setup1, echo=TRUE}
+setwd('G:/OneDrive - Texas Tech University/IE 5344 Statistical Data Analysis/Flipped Assignment 12')
+data <- read.csv('data-table-B8.csv', header = TRUE)
+colnames(data) <- c('x1', 'x2','y')
+head(data)
+```
+
+## Part a.
+```{r a, echo=TRUE}
+fit <- lm(y~., data)
+summary(fit)
+vif(fit)
+```
+
+## Part b.
+```{r b, echo=TRUE}
+fit1 <- lm(y~. + x1:x2, data)
+summary(fit1)
+vif(fit1)
+```
+
+## Part c. 
+```{r c, echo=TRUE}
+data2 <- scale(data,center=TRUE,scale=TRUE)
+data2 <- as.data.frame(data2)
+colnames(data2) <- c('x1','x2','y')
+fit2 <- lm(y~., data2)
+summary(fit2)
+vif(fit2)
+```
+
+## Part d.
+```{r d, echo=TRUE}
+fit3 <- lm(y~. + x1:x2, data2)
+summary(fit3)
+vif(fit3)
+```
+
+## Part e.
+In part a and part c, the VIF's for predictor variables remain the same since there are no interaction terms. However, in part b and part d, VIF's for all predictor variables decrease after standardizing which implies that the multicolinearity decreases.
+
