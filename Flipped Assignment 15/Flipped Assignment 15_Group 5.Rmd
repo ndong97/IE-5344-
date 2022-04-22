@@ -1,0 +1,73 @@
+---
+title: "Flipped Assignment 15"
+author: "Group 5"
+date: "2022/4/7"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(MASS)
+library(tibble)
+library(car)
+library(dplyr)
+library(ggplot2)
+```
+
+## Input Data and Function Definition
+```{r setup1, echo=TRUE}
+setwd('G:/OneDrive - Texas Tech University/IE 5344 Statistical Data Analysis/Flipped Assignment 15')
+data <- read.csv('data-table-B9.csv', header = TRUE)
+head(data)
+```
+
+## Part a.
+
+We standardize data because interaction terms are included. 
+```{r 1, echo=TRUE}
+data_1 <- scale(data[,1:4], center=TRUE, scale=TRUE)
+data_1 <- cbind(data_1, data$y)
+data_1 <- as.data.frame(data_1)
+colnames(data_1) <- c("x1", "x2", "x3", "x4", "y")
+head(data_1)
+```
+
+## Part b. 
+```{r 2, echo=TRUE}
+fit2 <- lm(y ~ 1, data_1)
+step(fit2, scope~x1 + x2 + x3 + x4 + x1:x2 + x1:x3+ x1:x4 + x2:x3 + x2:x4 + x3:x4,direction="forward")
+```
+
+The selected model is:
+```{r 3, echo=TRUE}
+fit_b <- lm(formula = y ~ x2 + x3 + x4 + x2:x4, data = data_1)
+summary(fit_b)
+```
+
+## Part c.
+```{r 4, echo=TRUE}
+fit2 <- lm(y ~ ., data_1)
+step(fit2, scope~x1 + x2 + x3 + x4 + x1:x2 + x1:x3+ x1:x4 + x2:x3 + x2:x4 + x3:x4,direction="both")
+```
+
+The selected model is:
+```{r 5, echo=TRUE}
+fit_c <- lm(formula = y ~ x2 + x3 + x4 + x2:x4, data = data_1)
+summary(fit_c)
+```
+
+## Part d.
+```{r 6, echo=TRUE}
+fit3 <- lm(y ~ . + .*., data_1)
+step(fit3, direction="backward")
+```
+
+The selected model is:
+```{r 7, echo=TRUE}
+fit_d <- lm(formula = y ~ x2 + x3 + x4 + x2:x4, data = data_1)
+summary(fit_d)
+```
+
+## Part. e
+
+We find the same model in parts b, c, and d. We think it is because the selecting criteria are the same, based on AIC, and the scopes are also the same.
