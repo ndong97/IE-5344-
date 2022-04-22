@@ -1,0 +1,34 @@
+---
+title: "Flipped Assignment 6"
+author: "Group 5"
+date: "2022/2/15"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(MASS)
+```
+
+## Input data
+
+```{r readdata, echo=TRUE}
+setwd('G:/OneDrive - Texas Tech University/IE 5344 Statistical Data Analysis/Flipped Assignment 6')
+data<-read.csv('data-table-B8.csv', header = TRUE)
+colnames(data) <- c("x1","x2","y")
+```
+
+## Part a. 
+
+```{r lm, echo=TRUE}
+fit <- lm(y~x1+x2,data)
+summary(fit)
+```
+
+## Part b. 
+
+```{r coefficients, echo=TRUE}
+fit$coefficients
+```
+
+So, $\hat{y} = 11.087 + 350.119x_1 + 0.109x_2$.
