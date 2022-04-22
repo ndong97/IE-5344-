@@ -1,0 +1,57 @@
+---
+title: "Flipped Assignment 16"
+author: "Group 5"
+date: "2022/4/12"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(MASS)
+library(tibble)
+library(car)
+library(dplyr)
+library(ggplot2)
+```
+
+## Input Data and Function Definition
+```{r setup1, echo=TRUE}
+setwd('G:/OneDrive - Texas Tech University/IE 5344 Statistical Data Analysis/Flipped Assignment 16')
+data <- read.csv('data-likelihood-exponential.csv', header = TRUE)
+head(data)
+```
+
+## Picking parameters.
+```{r 1, echo=TRUE}
+hist(data$x)
+```
+
+So, we pick three candidates of $\lambda$, 2, 1, and $\frac{1}{1.5}$.
+
+## Part a.
+
+```{r 2, echo=TRUE}
+data1 <- data[1:25,]
+Log_likelihood <- c()
+Log_likelihood_1 <- sum(log(dexp(data1,r=2)))
+Log_likelihood_2 <- sum(log(dexp(data1,r=1)))
+Log_likelihood_3 <- sum(log(dexp(data1,r=1/1.5)))
+Log_likelihood <- rbind(Log_likelihood,Log_likelihood_1,Log_likelihood_2,Log_likelihood_3)
+which.max(Log_likelihood)
+```
+So, $\lambda = 1$ could be the best candidate among these three choices.
+
+## Part b.
+
+```{r 3, echo=TRUE}
+Log_likelihood_b <- c()
+Log_likelihood_b1 <- sum(log(dexp(data$x,r=2)))
+Log_likelihood_b2 <- sum(log(dexp(data$x,r=1)))
+Log_likelihood_b3 <- sum(log(dexp(data$x,r=1/1.5)))
+Log_likelihood_b <- rbind(Log_likelihood_b,Log_likelihood_b1,Log_likelihood_b2,Log_likelihood_b3)
+which.max(Log_likelihood_b)
+```
+So, $\lambda = 1$ also could be the best candidate among these three choices.
+
+## Part c.
+In previous two parts, the best candidates are the same, which are $\lambda = 1$.
