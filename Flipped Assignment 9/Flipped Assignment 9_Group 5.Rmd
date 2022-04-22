@@ -1,0 +1,75 @@
+---
+title: "Flipped Assignment 9"
+author: "Group 5"
+date: "2022/2/24"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(MASS)
+library(tibble)
+```
+
+# Input Data
+```{r setup1, echo=TRUE}
+setwd('G:/OneDrive - Texas Tech University/IE 5344 Statistical Data Analysis/Flipped Assignment 9')
+data <- read.csv('data-table-B8.csv', header = TRUE)
+head(data)
+```
+
+# Part a. 
+```{r parta, echo=TRUE}
+fit1 <- lm(y~x1+x2+x1:x2, data)
+summary(fit1)
+fit1$coefficients
+```
+
+So $\hat{y} =12.5013 + 256.7374x_1 + 0.0988x_2 + 0.7613x_1x_2$.
+
+# Part b.
+## Check for Model Adequacy
+```{r partb11, echo=TRUE}
+plot(fit1,1)
+```
+
+This figure ensures the constant variance.
+
+```{r partb12, echo=TRUE}
+plot(fit1,2)
+```
+
+This figures ensures the normality.
+
+```{r partb13, echo=TRUE}
+plot(fit1,3)
+```
+
+We don't think there is any outliers.
+
+```{r partb15, echo=TRUE}
+plot(fit1,5)
+```
+
+We don't think there is any outliers. So this model has model adequacy and no transformation is needed.
+
+# Part c.
+```{r partc, echo=TRUE}
+summary(fit1)
+```
+
+Reject $H_0$ because $p-value<0.05$. So we can conclude that least one of these regressors contributes significantly to the model.
+
+# Part d.
+```{r partd1, echo=TRUE}
+fit2 <- lm(y~x1+x2, data)
+anova(fit2,fit1)
+```
+
+So we drop $x_1x_2$ because we don't reject $H_0$ for $p-value>0.05$.
+
+```{r partd2, echo=TRUE}
+summary(fit2)
+```
+
+So from the summary table, we keep $x_1$ and $x_2$ as these regressors are significant under level of $0.0001$. So fit2 is the best model.
