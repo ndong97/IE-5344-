@@ -1,0 +1,126 @@
+---
+title: "Flipped Assignment 10"
+author: "Group 5"
+date: "2022/3/1"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(MASS)
+library(tibble)
+```
+
+# Input Data
+```{r setup1, echo=TRUE}
+setwd('C:/Users/ndong/OneDrive - Texas Tech University/IE 5344 Statistical Data Analysis/Flipped Assignment 10')
+data <- read.csv('data-SoftDrinkDeliveryTime.csv', header = TRUE)
+data <- data[,-1]
+colnames(data) <- c('y', 'x1', 'x2')
+head(data)
+```
+
+# Part a.
+```{r a, echo=TRUE}
+fit <- lm(y~. + I(x1^2) + I(x2^2) + x1:x2,data)
+summary(fit)
+```
+
+So $\hat{y} = 2.341231 + 1.615907x_1 + 0.014385x_2$. The $R^2$ is 0.9596 and the adjusted one is 0.9559.
+
+# Part b.
+```{r b1, echo=TRUE}
+plot(fit,1)
+```
+
+From the first figure, there is a pattern implying nonlinearity.
+
+```{r b2, echo=TRUE}
+plot(fit,2)
+```
+
+From the second figure, it is light-tailed distribution.
+
+```{r b3, echo=TRUE}
+plot(fit,3)
+```
+
+From the third figure, data No.9 looks like an outlier.
+
+```{r b4, echo=TRUE}
+plot(fit,4)
+```
+
+From the fourth figure, data No.9 is the only point whose Cook's distance is greater than 1.
+
+```{r b5, echo=TRUE}
+plot(fit,5)
+```
+
+From the fifth figure, we can have the same conclusion as that from figure 4.
+
+To be concluded, data No.9 is influential.
+
+# Part c.
+
+As what we conclude in Part b, we remove data No.9:
+
+```{r c, echo=TRUE}
+data <- data[-9,]
+```
+
+# Part d.
+
+```{r d, echo=TRUE}
+fit1 <- lm(y~.,data)
+summary(fit1)
+```
+
+So $\hat{y} = 4.447238 + 1.497691x_1 + 0.010324x_2$. The $R^2$ is 0.9487 and the adjusted one is 0.9438.
+
+# Part e. 
+
+```{r e1, echo=TRUE}
+plot(fit1,1)
+```
+
+From the first figure, there is no pattern.
+
+```{r e2, echo=TRUE}
+plot(fit1,2)
+```
+
+From the second figure, it is straight.
+
+```{r e3, echo=TRUE}
+plot(fit1,3)
+```
+
+From the third figure, we don't think there is any outliers.
+
+```{r e4, echo=TRUE}
+plot(fit1,4)
+```
+
+From the fourth figure, there is no point whose Cook's distance is greater than 1.
+
+```{r e5, echo=TRUE}
+plot(fit1,5)
+```
+
+From the fifth figure, we can see one point that has high leverage and no points whose Cook's distance is greater than 1.
+
+To be concluded, this model is adequate.
+
+# Part f.
+
+```{r f, echo=TRUE}
+H <- hatvalues(fit1)
+H[which.max(H)]
+```
+
+Point No.22 has high leverage. 
+
+# Part g.
+
+That point No.22 is not influential because it's not an outlier. So, we don't remove it.
