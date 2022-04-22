@@ -1,0 +1,74 @@
+---
+title: "Flipped Assignment 6"
+author: "Group 5"
+date: "2022/2/15"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(MASS)
+```
+
+## Part a.
+
+```{r readdata, echo=TRUE}
+setwd('G:/OneDrive - Texas Tech University/IE 5344 Statistical Data Analysis/Flipped Assignment 6')
+data<-read.csv('data-table-B8.csv', header = TRUE)
+colnames(data) <- c("x1","x2","y")
+x0 <- rep(1,36)
+X <- cbind(x0,data$x1,data$x2)
+colnames(X) <- c("x0","x1","x2")
+Y <- as.matrix(data$y)
+```
+
+The function should be:
+
+$Y = X\boldsymbol{\beta} + \boldsymbol{\epsilon}$ 
+
+$y = \beta_0 + \beta_1x_1 + \beta_2x_2 + \epsilon$
+
+
+
+## Part b.
+
+$\widehat{\boldsymbol{\beta}} = \left(X^\top X\right)^{-1}X^\top Y$
+
+$Y$ is 
+
+```{r data1, echo=TRUE}
+Y
+```
+
+The dimensionality of $Y$ is 
+
+```{r Y, echo=TRUE}
+dim(Y)
+```
+
+$X$ is 
+
+```{r data2, echo=TRUE}
+X
+```
+
+The dimensionality of $X$ is 
+
+```{r X, echo=TRUE}
+dim(X)
+```
+
+## Part c.
+The least squares estimated $\boldsymbol{\beta}$ is
+
+```{r beta, echo=TRUE}
+beta <- ginv(t(X)%*%X)%*%t(X)%*%Y
+beta
+```
+
+## Part d. (02/17/2022 Flipped Assignment 7)
+
+```{r beta, echo=TRUE}
+fit <- lm(y~x1+x2,data)
+fit$coefficients
+```
