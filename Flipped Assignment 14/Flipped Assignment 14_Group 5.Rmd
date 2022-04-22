@@ -1,0 +1,86 @@
+---
+title: "Flipped Assignment 14"
+author: "Group 5"
+date: "2022/4/6"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(MASS)
+library(tibble)
+library(car)
+library(dplyr)
+library(ggplot2)
+```
+
+## Input Data and Function Definition
+```{r setup1, echo=TRUE}
+setwd('C:/Users/ndong/OneDrive - Texas Tech University/IE 5344 Statistical Data Analysis/Flipped Assignment 14')
+data <- read.csv('data-table-B9.csv', header = TRUE)
+head(data)
+fit.summary<-function(models){
+  library(broom)
+  fitted<-lapply(models, lm, data=data)
+  fitted<-lapply(fitted,glance)
+  fitted<-as.data.frame(do.call(rbind.data.frame,fitted))
+  fitted<-cbind(models,fitted)
+  fitted[order(fitted$AIC), ]
+}
+```
+
+## Candidate Models
+Here we have 15 candidate models. We omit the model that only has intercept.
+
+```{r 1, echo=TRUE}
+models <- c("y ~ x1",
+            "y ~ x2",
+            "y ~ x3",
+            "y ~ x4",
+            "y ~ x1 + x2",
+            "y ~ x1 + x3",
+            "y ~ x1 + x4",
+            "y ~ x2 + x3",
+            "y ~ x2 + x4",
+            "y ~ x3 + x4",
+            "y ~ x1 + x2 + x3",
+            "y ~ x1 + x2 + x4",
+            "y ~ x1 + x3 + x4",
+            "y ~ x2 + x3 + x4",
+            "y ~ x1 + x2 + x3 + x4")
+```
+
+## Best Model Selected by AIC
+
+We first choose $y = \beta_0 + \beta_1x_2 + \beta_2x_2 + \beta_3x_3 + \beta_4x_4$ be the best model.
+```{r 2, echo=TRUE}
+fit.summary(models)
+bestfit <- lm(y ~ x1 + x2 + x3 + x4, data)
+summary(bestfit)
+```
+
+Then, we check the model adequacy:
+```{r 3, echo=TRUE}
+plot(bestfit)
+```
+This model is adequate. However, from the summary of this model, $x_1$ is not significant for its p-value is greater than 0.05. So we pick the models that have the second and the third smallest AIC.
+
+```{r 4, echo=TRUE}
+bestfit_opt1 <- lm(y ~ x2 + x3 + x4, data)
+summary(bestfit_opt1)
+bestfit_opt2 <- lm(y ~ x2 + x3, data)
+summary(bestfit_opt2)
+```
+
+The model that has the second smallest AIC has similar issue of previous model, $x_4$ is not significant. The model that has the third smallest AIC could be the best model. So, we check its model adequacy.
+
+```{r 5, echo=TRUE}
+plot(bestfit_opt2)
+```
+
+This model is adequate. So, we pick it to be our best model for the following reasons:
+
+(1) Its AIC is 383.5622, which is slightly greater than the smallest AIC among candidate models.
+(2) Its adjusted $R^2$ is 0.6546, which is slightly less than the largest adjusted $R^2$ among candidate models.
+(3) Its p-value of whole regression model is the smallest among the candidate models.
+(4) All of its predictor variables are significant.
