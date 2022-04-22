@@ -1,0 +1,97 @@
+---
+title: "Flipped Assignment 13"
+author: "Group 5"
+date: "2022/4/1"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(MASS)
+library(tibble)
+library(car)
+library(dplyr)
+library(ggplot2)
+```
+
+## Input Data
+```{r setup1, echo=TRUE}
+setwd('G:/OneDrive - Texas Tech University/IE 5344 Statistical Data Analysis/Flipped Assignment 13')
+data <- read.csv('data-heartbeat-3.csv', header = TRUE)
+dat <- data %>%
+  na_if("") %>%
+  na.omit
+dat <- dat[,-c(5,6,7,8,9,10)]
+colnames(dat) <- c('y', 'x1', 'x2', 'x3', 'x4')
+head(dat)
+```
+
+## Part a.
+Continent is categorical. 
+```{r a, echo=TRUE}
+dat$x1 <- as.factor(dat$x1)
+fit1 <- lm(y ~ x1, dat)
+summary(fit1)
+```
+
+We don't think continent is significant because p-values of both its coded variables are greater than 0.05. Moreover, the p-value of whole model is also greater than 0.05. For parameters' interpretation, when an observation is from Africa, his/her heartbeat is expected to be 71 bpm. If an observation is from Asia, his/her heartbeat is expected to be 77.667 bpm. If an observation is from South America, his/her heartbeat is expected to be 72 bpm.
+
+## Part b.
+Exercise frequency is ordinal. Assume that the marginal response is fixed. 
+```{r b, echo=TRUE}
+str(dat)
+fit2 <- lm(y ~ x2, dat)
+summary(fit2)
+```
+
+We don't think exercise frequency is significant because its p-value greater than 0.05. Moreover, the p-value of whole model is also greater than 0.05. For parameters' interpretation, when the level of exercise frequency increases by 1, the expected increase in heartbeat is 1.167 bpm.
+
+## Part c. 
+Exercise frequency is ordinal. Assuming that the marginal response varies, it is treated categorical. 
+```{r c, echo=TRUE}
+dat$x2 <- as.factor(dat$x2)
+str(dat)
+fit3 <- lm(y ~ x2, dat)
+summary(fit3)
+```
+
+We don't think exercise frequency is significant because p-values of all its coded variables are greater than 0.05. Moreover, the p-value of whole model is also greater than 0.05. For parameters' interpretation, when an observation's exercise frequency is 1, his/her heartbeat is expected to be 70 bpm. If an observation's exercise frequency is 2, his/her heartbeat is expected to be 74.667 bpm. If an observation's exercise frequency is 3, his/her heartbeat is expected to be 79.333 bpm. If an observation's exercise frequency is 4, his/her heartbeat is expected to be 74.667 bpm.
+
+## Part d.
+### (1) 
+
+We consider the marginal effects of $x_2$ and $x_4$ to vary because we have no background knowledge for their effects. Assuming the marginal effects of them gives flexibility to do regression. The full model is 
+
+```{r d11, echo=TRUE}
+dat$x4 <- as.factor(dat$x4)
+dat$x3 <- as.factor(dat$x3)
+str(dat)
+fit4 <- lm(y ~., dat)
+summary(fit4)
+```
+
+Here we remove the variable that has the largest p-value, which is continent. The model becomes
+
+```{r d12, echo=TRUE}
+dat <- dat[,-2]
+fit5 <- lm(y ~., dat)
+summary(fit5)
+```
+
+Removing exercise frequency, the model becomes
+
+```{r d13, echo=TRUE}
+dat <- dat[,-2]
+fit6 <- lm(y ~., dat)
+summary(fit6)
+```
+
+Removing gender, the model becomes
+
+```{r d14, echo=TRUE}
+dat <- dat[,-2]
+fit7 <- lm(y ~., dat)
+summary(fit7)
+```
+
+Unfortunately, all the predictor variables are not significant. 
