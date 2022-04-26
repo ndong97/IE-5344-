@@ -1,0 +1,57 @@
+---
+title: "Flipped Assignment 18"
+author: "Group 5"
+date: "2022/4/26"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(MASS)
+library(tibble)
+library(car)
+library(dplyr)
+library(ggplot2)
+```
+
+## Input Data
+```{r setup1, echo=TRUE}
+setwd('G:/OneDrive - Texas Tech University/IE 5344 Statistical Data Analysis/Flipped Assignment 18')
+data <- read.csv('data-13-5.csv', header = TRUE)
+```
+
+## Part a.
+```{r 1, echo=TRUE}
+fit <- glm(y~., data, family = binomial(link='logit'))
+summary(fit)
+```
+
+So, $logit = -7.047 + 7.382e-5x_1 + 9.879e-01x_2$.
+
+## Part b.
+
+The null deviance is 27.726 and the residual deviance is 21.082.
+
+```{r 2, echo=TRUE}
+qchisq(0.95,1)
+```
+
+This model is significant because $3.841459 < 6.644$.
+
+## Part c.
+```{r 3, echo=TRUE}
+O1 <- exp(1000*7.382e-5)
+O2 <- exp(9.879e-01)
+O1
+O2
+```
+For the total family income's increase by $1000$ dollar, the estimated probability of buying a new car in next 6 months increases by about 7.7%.
+
+For the age of oldest car's increase by 1 year, the estimated probability of buying a new car in next 6 months increases by about 168.56%.
+
+## Part d.
+```{r 4, echo=TRUE}
+predict(fit, data.frame(x1 = c(45000), x2 = c(5)), type='response')
+```
+
+The estimated probability that a family with an income of $45,000 and a car that is 5 years old will purchase a new vehicle in the next 6 months is 77.10%.
