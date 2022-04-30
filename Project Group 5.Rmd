@@ -2,7 +2,9 @@
 title: "Project Group 5"
 author: "Group 5"
 date: "2022/4/30"
-output: pdf_document
+output: 
+  pdf_document: 
+    latex_engine: xelatex
 ---
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -10,8 +12,8 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Data Description
 ```{r data description, echo=TRUE}
-setwd('C:/Users/Saunak Panda/OneDrive - Texas Tech University/Work/TTU/Coursework/Spring 2022/Stat Data Analysis')
-dat <- read.csv("RadDat_5344.csv")
+setwd("G:/OneDrive - Texas Tech University/IE 5344 Statistical Data Analysis/Project")
+dat <- read.csv("RadDat_5344.csv", header=TRUE)
 head(dat)
 str(dat)
 ```
@@ -29,7 +31,6 @@ dat$Loc.At.Exam.Complete <- as.factor(dat$Loc.At.Exam.Complete)
 dat$Exam.Completed.Bucket <- as.factor(dat$Exam.Completed.Bucket)
 dat$Exam.Room <- as.factor(dat$Exam.Room)
 str(dat)
-
 # Converting the data frame into variables of x's and y
 x <- dat[,2:11]
 x1 <- x[,-7]
@@ -41,11 +42,13 @@ Talk about what and why we needed to transform the data
 
 ## Model Adequacy
 
-```{r adequacy , echo=TRUE}
+```{r adequacy , echo=TRUE,fig.width = 3.5, fig.height=3.5}
 # Fit basic model
 fit1 <- lm(y~.,dat_clean)
 summary(fit1)
-
+# Remove x4
+dat_clean <- dat_clean[,-5]
+fit1 <- lm(y~.,dat_clean)
 # Check model for adequacy
 plot(fit1,1) # Residuals vs Fitted
 plot(fit1,2) # Normal Q-Q
@@ -53,35 +56,84 @@ plot(fit1,3) # Standardized Residuals vs Fitted
 ```
 Talking about the model adequacy plots and need for transformation
 
-```{r transform, echo=TRUE}
+```{r transform, echo=TRUE, fig.width = 3.5, fig.height=3.5}
 # Checking if the model needs a boxcox transformation
 library(MASS)
 b <- boxcox(fit1)
 lambda <- b$x
 likelihood <- b$y
 lambda_max <- lambda[which.max(likelihood)]
-
+lambda_max
 # Performing a transformation accordingly
 dat_clean$y <- (dat_clean$y)^lambda_max
 fit2 <- lm(y~., dat_clean)
 plot(fit2)
 ```
-Talking about the effects of the transformation and then checking for unusual points
-
-```{r outliers, echo=TRUE}
+```{r outliers, echo=TRUE, fig.width = 3.5, fig.height=3.5}
 # Check for outliers, leverage points and influential points
 plot(fit2,4)
 plot(fit2,5)
 plot(fit2,6)
 ```
+Explain about outliers, leverage and influential points.
 
-```{r leverage, echo=TRUE}
-cooksfcn<-function(model){
-  dat<-as.data.frame(cooks.distance(model))
-  pt_num<-order(-dat)
-  cooksd<-dat[order(-dat[,1]),]
-  print("Influence - Cooks Distance")
-  cbind(pt_num,cooksd)}
-cooksfcn(fit2)
+## Multiplie Linear Regression - Inference
+
+### ANOVA
+
+```{r anova , echo=TRUE,fig.width = 3.5, fig.height=3.5}
+fit2_all <- lm(y ~1, dat_clean)
+anova(fit2_all, fit2)
+# p-value < 0.05, so H0 is rejected, so we conclude that at least one of these predictors contributes significantly.
 ```
 
+
+```{r anova1 , echo=TRUE,fig.width = 3.5, fig.height=3.5}
+fit2_1 <- lm(y ~. - x1, dat_clean)
+anova(fit2_1, fit2)
+# don't drop x1 because p-value < 0.05, so H0 is rejected.
+```
+
+```{r anova2 , echo=TRUE,fig.width = 3.5, fig.height=3.5}
+fit2_2 <- lm(y ~. - x2, dat_clean)
+anova(fit2_2, fit2)
+# don't drop x2 because p-value < 0.05, so H0 is rejected.
+```
+
+```{r anova3 , echo=TRUE,fig.width = 3.5, fig.height=3.5}
+fit2_3 <- lm(y ~. - x3, dat_clean)
+anova(fit2_3, fit2)
+# don't drop x3 because p-value < 0.05, so H0 is rejected.
+```
+
+```{r anova5 , echo=TRUE,fig.width = 3.5, fig.height=3.5}
+fit2_5 <- lm(y ~. - x5, dat_clean)
+anova(fit2_5, fit2)
+# don't drop x5 because p-value < 0.05, so H0 is rejected.
+```
+
+```{r anova6 , echo=TRUE,fig.width = 3.5, fig.height=3.5}
+fit2_6 <- lm(y ~. - x6, dat_clean)
+anova(fit2_6, fit2)
+# don't drop x6 because p-value < 0.05, so H0 is rejected.
+```
+
+```{r anova7 , echo=TRUE,fig.width = 3.5, fig.height=3.5}
+fit2_7 <- lm(y ~. - x7, dat_clean)
+anova(fit2_7, fit2)
+# don't drop x7 because p-value < 0.05, so H0 is rejected.
+```
+
+```{r anova8 , echo=TRUE,fig.width = 3.5, fig.height=3.5}
+fit2_8 <- lm(y ~. - x8, dat_clean)
+anova(fit2_8, fit2)
+# don't drop x8 because p-value < 0.05, so H0 is rejected.
+```
+
+```{r anova9 , echo=TRUE,fig.width = 3.5, fig.height=3.5}
+fit2_9 <- lm(y ~. - x9, dat_clean)
+anova(fit2_9, fit2)
+# don't drop x9 because p-value < 0.05, so H0 is rejected.
+```
+
+Explain the model selected by ANOVA.
