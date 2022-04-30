@@ -4,6 +4,10 @@ author: "Group 5"
 date: "2022/4/30"
 output: pdf_document
 ---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
 ## Data Description
 ```{r data description, echo=TRUE}
 setwd('C:/Users/Saunak Panda/OneDrive - Texas Tech University/Work/TTU/Coursework/Spring 2022/Stat Data Analysis')
@@ -11,6 +15,7 @@ dat <- read.csv("RadDat_5344.csv")
 head(dat)
 str(dat)
 ```
+Talk about the data in brief
 ## Data Pre-treatment
 ```{r data conversion, echo=TRUE}
 # Converting the variables to correct types
@@ -32,6 +37,8 @@ dat_clean <- cbind(dat$Ordered.to.Complete...Mins,as.data.frame(x1))
 head(dat_clean)
 colnames(dat_clean) <- c("y","x1","x2","x3","x4","x5","x6","x7","x8","x9")
 ```
+Talk about what and why we needed to transform the data
+
 ## Model Adequacy
 
 ```{r adequacy , echo=TRUE}
@@ -39,9 +46,23 @@ colnames(dat_clean) <- c("y","x1","x2","x3","x4","x5","x6","x7","x8","x9")
 fit1 <- lm(y~.,dat_clean)
 summary(fit1)
 
-#Check model for 
-# Check for outliers, leverage points ab
+# Check model for adequacy
+plot(fit1,1) # Residuals vs Fitted
+plot(fit1,2) # Normal Q-Q
+plot(fit1,3) # Standardized Residuals vs Fitted
+```
+Talking about the model adequacy plots and need for transformation
+
+```{r transform, echo=TRUE}
+library(MASS)
+boxcox(dat_clean$y~x,dat_clean)
+```
+
+
+```{r outliers, echo=TRUE}
+# Check for outliers, leverage points and influential points
 plot(fit1,4)
 plot(fit1,5)
+plot(fit1,6)
 ```
 
