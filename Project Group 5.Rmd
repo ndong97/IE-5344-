@@ -1,0 +1,47 @@
+---
+title: "Project Group 5"
+author: "Group 5"
+date: "2022/4/30"
+output: pdf_document
+---
+## Data Description
+```{r data description, echo=TRUE}
+setwd('C:/Users/Saunak Panda/OneDrive - Texas Tech University/Work/TTU/Coursework/Spring 2022/Stat Data Analysis')
+dat <- read.csv("RadDat_5344.csv")
+head(dat)
+str(dat)
+```
+## Data Pre-treatment
+```{r data conversion, echo=TRUE}
+# Converting the variables to correct types
+dat$Unique.Identifiers <- as.factor(as.character(dat$Unique.Identifier))
+dat$Radiology.Technician <- as.factor(as.character(dat$Radiology.Technician))
+dat$CatalogCode <- as.factor(dat$CatalogCode)
+dat$In.Rad.Room <- as.factor(dat$In.Rad.Room)
+dat$PatientTypeMnemonic <- as.factor(dat$PatientTypeMnemonic)
+dat$Priority <- as.factor(dat$Priority)
+dat$Loc.At.Exam.Complete <- as.factor(dat$Loc.At.Exam.Complete)
+dat$Exam.Completed.Bucket <- as.factor(dat$Exam.Completed.Bucket)
+dat$Exam.Room <- as.factor(dat$Exam.Room)
+str(dat)
+
+# Converting the data frame into variables of x's and y
+x <- dat[,2:11]
+x1 <- x[,-7]
+dat_clean <- cbind(dat$Ordered.to.Complete...Mins,as.data.frame(x1))
+head(dat_clean)
+colnames(dat_clean) <- c("y","x1","x2","x3","x4","x5","x6","x7","x8","x9")
+```
+## Model Adequacy
+
+```{r adequacy , echo=TRUE}
+# Fit basic model
+fit1 <- lm(y~.,dat_clean)
+summary(fit1)
+
+#Check model for 
+# Check for outliers, leverage points ab
+plot(fit1,4)
+plot(fit1,5)
+```
+
