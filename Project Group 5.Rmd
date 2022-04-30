@@ -32,7 +32,6 @@ str(dat)
 
 # Converting the data frame into variables of x's and y
 x <- dat[,2:11]
-
 x1 <- x[,-7]
 dat_clean <- cbind(dat$Ordered.to.Complete...Mins,as.data.frame(x1))
 head(dat_clean)
