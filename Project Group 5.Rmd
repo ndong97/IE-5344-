@@ -32,6 +32,7 @@ str(dat)
 
 # Converting the data frame into variables of x's and y
 x <- dat[,2:11]
+
 x1 <- x[,-7]
 dat_clean <- cbind(dat$Ordered.to.Complete...Mins,as.data.frame(x1))
 head(dat_clean)
@@ -54,15 +55,34 @@ plot(fit1,3) # Standardized Residuals vs Fitted
 Talking about the model adequacy plots and need for transformation
 
 ```{r transform, echo=TRUE}
+# Checking if the model needs a boxcox transformation
 library(MASS)
-boxcox(dat_clean$y~x,dat_clean)
-```
+b <- boxcox(fit1)
+lambda <- b$x
+likelihood <- b$y
+lambda_max <- lambda[which.max(likelihood)]
 
+# Performing a transformation accordingly
+dat_clean$y <- (dat_clean$y)^lambda_max
+fit2 <- lm(y~., dat_clean)
+plot(fit2)
+```
+Talking about the effects of the transformation and then checking for unusual points
 
 ```{r outliers, echo=TRUE}
 # Check for outliers, leverage points and influential points
-plot(fit1,4)
-plot(fit1,5)
-plot(fit1,6)
+plot(fit2,4)
+plot(fit2,5)
+plot(fit2,6)
+```
+
+```{r leverage, echo=TRUE}
+cooksfcn<-function(model){
+  dat<-as.data.frame(cooks.distance(model))
+  pt_num<-order(-dat)
+  cooksd<-dat[order(-dat[,1]),]
+  print("Influence - Cooks Distance")
+  cbind(pt_num,cooksd)}
+cooksfcn(fit2)
 ```
 
