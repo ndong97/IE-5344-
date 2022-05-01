@@ -2,26 +2,45 @@
 title: "Project Group 5"
 author: "Group 5"
 date: "2022/4/30"
-output: 
-  pdf_document: 
-    latex_engine: xelatex
+output:
+  pdf_document: pdf_document
 ---
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
+In this project, we are helping Care One hospital by providing them with some regression models that would help them find the reasons due to which the providers are observing excessively long duration to receive an ordered X-ray. We have multiple variables which could be affecting the response variable "Ordered to Time Complete (min)". 
 
+The predictor variables which are being considered are:
+  
+  1. "Unique.Identifier", which is a $\textbf{ID}$ variable to uniquely identify each patient
+  2. "PatientAge", which is a $\textbf{numerical}$ variable, and describes the age of the patients in years
+  3. "Radiology.Technician", which is a $\textbf{categorical}$ variable, to uniquely identify Radiology Technician. There are 71 identified       technicians in the data 
+  4. "CatalogCode", which is a $\textbf{categorical}$ variable, and describes the type of X-ray performed. There are 121 identified types 
+  5. "In.Rad.Room", which is a $\textbf{binary}$ variable, and describes whether the scan was performed in the Radiology room or not. So,         there are 2 types
+  6. "PatientType", which is a $\textbf{categorical}$ variable to identify the type of patient in the hospital like Inpatient (IP),               Outpatient Emergency Center (OPEC), Outpatient Observation (OPOBS), and Outpatient Surgery (OPSRG). So, there are 4 types of patients.
+  7. "Priority", which is a $\textbf{categorical}$ variable, and describes about the urgency of the scan like Routine or STAT. So, there are      2 types.
+  8. "Ordered.to.Complete...(mins)", which is a $\textbf{numerical}$ variable, and tells the time between the X-ray order and the completion by       physician
+  9. "Loc.At.Exam.Complete", which is a $\textbf{categorical}$ variable, and describes where the patient was in the hospital when the order was      completed. There are 25 locations identified from the data
+  10. "Exam.Completed.Bucket" which is a $\textbf{categorical}$ variable, and describes the shifts of the radiology technicians to complete          exams. There are 3 such shifts
+  11. "Exam.Room" which is a $\textbf{categorical}$ variable, and describes where the X-ray was physically performed. There are 13 rooms             identified from the data
+  
 ## Data Description
-```{r data description, echo=TRUE}
-setwd("G:/OneDrive - Texas Tech University/IE 5344 Statistical Data Analysis/Project")
+```{r data description}
+setwd('C:/Users/Saunak/OneDrive - Texas Tech University/Work/TTU/Coursework/Spring 2022/Stat Data Analysis')
+#setwd("G:/OneDrive - Texas Tech University/IE 5344 Statistical Data Analysis/Project")
 dat <- read.csv("RadDat_5344.csv", header=TRUE)
 head(dat)
 str(dat)
 ```
-Talk about the data in brief
+Since the data provided to us is not in the most usable form for regression, so we perform data pre-treatment. Here, we convert the data types from character variables to categorical variables. Also, the binary variable, "In.Rad.Room" is also converted to a categorical variable with two levels.
+
+Finally, after converting all the variables to the appropriate form, we shall now decide which of the variables are going to be predictor variables. Setting the "Ordered.to.Complete...Mins" as response variable ($y$) and all other variables except "Unique.Identifier" shall be set as predictor variables ($x_1,x_2,\dotso,x_9$). We shall then bind these variables into a data frame (dat_clean).  
+
+  
 ## Data Pre-treatment
 ```{r data conversion, echo=TRUE}
 # Converting the variables to correct types
-dat$Unique.Identifiers <- as.factor(as.character(dat$Unique.Identifier))
+dat$Unique.Identifier <- as.factor(as.character(dat$Unique.Identifier))
 dat$Radiology.Technician <- as.factor(as.character(dat$Radiology.Technician))
 dat$CatalogCode <- as.factor(dat$CatalogCode)
 dat$In.Rad.Room <- as.factor(dat$In.Rad.Room)
@@ -38,7 +57,7 @@ dat_clean <- cbind(dat$Ordered.to.Complete...Mins,as.data.frame(x1))
 head(dat_clean)
 colnames(dat_clean) <- c("y","x1","x2","x3","x4","x5","x6","x7","x8","x9")
 ```
-Talk about what and why we needed to transform the data
+Having converted the data and having set the variables into a data frame, we are ready to build our basic model. 
 
 ## Model Adequacy
 
@@ -67,8 +86,13 @@ lambda_max
 # Performing a transformation accordingly
 dat_clean$y <- (dat_clean$y)^lambda_max
 fit2 <- lm(y~., dat_clean)
-plot(fit2)
+#Check the diagnostic plots again after transformation
+plot(fit2,1) # Residuals vs Fitted
+plot(fit2,2) # Normal Q-Q
+plot(fit2,3) # Standardized Residuals vs Fitted
 ```
+Talking about the plots after transformation
+
 ```{r outliers, echo=TRUE, fig.width = 3.5, fig.height=3.5}
 # Check for outliers, leverage points and influential points
 plot(fit2,4)
@@ -137,3 +161,37 @@ anova(fit2_9, fit2)
 ```
 
 Explain the model selected by ANOVA.
+
+### Step-wise Regression (AIC)
+
+```{r forward step, echo=TRUE}
+# Build a basic model regressing y on 1.
+fit3_1 <- lm(y~1,dat_clean)
+formula(fit3_1)
+
+# Perform a forward step-wise regression
+step(fit3_1, scope~x1+x2+x3+x4+x5+x6+x7+x8+x9,direction = "forward")
+```
+Best model considering AIC when performing step-wise regression in forward direction is $y=\beta_2 x_2+\beta_3 x_3+\beta_5 x_5+\beta_6 x_6+\beta_7 x_7 +\beta_8 x_8 +\beta_9 x_9$. Now, we shall perform a backward step-wise regression to check what model we get.
+
+```{r backward step, echo=TRUE}
+# Build a basic model regressing y on all the variables.
+fit3_2 <- lm(y~.,dat_clean)
+formula(fit3_2)
+
+# Perform a backward step-wise regression
+step(fit3_2, scope~x1+x2+x3+x4+x5+x6+x7+x8+x9,direction = "backward")
+```
+
+We observe that with the backward step-wise regression, we again obtain the same best model with the least AIC value of 760935.9. We shall finally verify if we get the same model with step-wise regression in both directions simultaneously.
+
+```{r both step, echo=TRUE}
+# Build a basic model regressing y on all the variables.
+fit3_3 <- lm(y~.,dat_clean)
+formula(fit3_3)
+
+# Perform step-wise regression in both directions
+step(fit3_3, scope~x1+x2+x3+x4+x5+x6+x7+x8+x9,direction = "both")
+```
+
+With this approach as well, we observe that the best model selected is same as the one obtained from the previous two approaches.
