@@ -1,46 +1,53 @@
 ---
 title: "Project Group 5"
 author: "Group 5"
-date: "2022/5/1"
-output: 
-  pdf_document: 
-    latex_engine: xelatex
+date: "2022/4/30"
+output: pdf_document
+
 ---
 
 # 1. Introductioln
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
-In this project, we are helping Care One hospital by providing them with some regression models that would help them find the reasons due to which the providers are observing excessively long duration to receive an ordered X-ray. We have multiple variables which could be affecting the response variable "Ordered to Time Complete (min)". 
+
+In this project, we are helping Care One hospital by providing them with some regression models that would help them find the reasons due to which the providers are observing excessively long duration to receive an ordered X-ray.
+We have multiple variables which could be affecting the response variable "Ordered to Time Complete (min)".
 
 The predictor variables which are being considered are:
-  
-  1. "Unique.Identifier", which is a $\textbf{ID}$ variable to uniquely identify each patient
-  2. "PatientAge", which is a $\textbf{numerical}$ variable, and describes the age of the patients in years
-  3. "Radiology.Technician", which is a $\textbf{categorical}$ variable, to uniquely identify Radiology Technician. There are 71 identified       technicians in the data 
-  4. "CatalogCode", which is a $\textbf{categorical}$ variable, and describes the type of X-ray performed. There are 121 identified types 
-  5. "In.Rad.Room", which is a $\textbf{binary}$ variable, and describes whether the scan was performed in the Radiology room or not. So,         there are 2 types
-  6. "PatientType", which is a $\textbf{categorical}$ variable to identify the type of patient in the hospital like Inpatient (IP),               Outpatient Emergency Center (OPEC), Outpatient Observation (OPOBS), and Outpatient Surgery (OPSRG). So, there are 4 types of patients.
-  7. "Priority", which is a $\textbf{categorical}$ variable, and describes about the urgency of the scan like Routine or STAT. So, there are      2 types.
-  8. "Ordered.to.Complete...(mins)", which is a $\textbf{numerical}$ variable, and tells the time between the X-ray order and the completion by       physician
-  9. "Loc.At.Exam.Complete", which is a $\textbf{categorical}$ variable, and describes where the patient was in the hospital when the order was      completed. There are 25 locations identified from the data
-  10. "Exam.Completed.Bucket" which is a $\textbf{categorical}$ variable, and describes the shifts of the radiology technicians to complete          exams. There are 3 such shifts
-  11. "Exam.Room" which is a $\textbf{categorical}$ variable, and describes where the X-ray was physically performed. There are 13 rooms             identified from the data
-  
-We will fit a first-order linear regression model on the response variable, propose valid models and do inference on them. 
-  
+
+1.  "Unique.Identifier", which is a $\textbf{ID}$ variable to uniquely identify each patient
+2.  "PatientAge", which is a $\textbf{numerical}$ variable, and describes the age of the patients in years
+3.  "Radiology.Technician", which is a $\textbf{categorical}$ variable, to uniquely identify Radiology Technician. There are 71 identified technicians in the data
+4.  "CatalogCode", which is a $\textbf{categorical}$ variable, and describes the type of X-ray performed. There are 121 identified types
+5.  "In.Rad.Room", which is a $\textbf{binary}$ variable, and describes whether the scan was performed in the Radiology room or not. So, there are 2 types
+6.  "PatientType", which is a $\textbf{categorical}$ variable to identify the type of patient in the hospital like Inpatient (IP), Outpatient Emergency Center (OPEC), Outpatient Observation (OPOBS), and Outpatient Surgery (OPSRG). So, there are 4 types of patients.
+7.  "Priority", which is a $\textbf{categorical}$ variable, and describes about the urgency of the scan like Routine or STAT. So, there are 2 types.
+8.  "Ordered.to.Complete...(mins)", which is a $\textbf{numerical}$ variable, and tells the time between the X-ray order and the completion by physician
+9.  "Loc.At.Exam.Complete", which is a $\textbf{categorical}$ variable, and describes where the patient was in the hospital when the order was completed. There are 25 locations identified from the data
+10. "Exam.Completed.Bucket" which is a $\textbf{categorical}$ variable, and describes the shifts of the radiology technicians to complete exams. There are 3 such shifts
+11. "Exam.Room" which is a $\textbf{categorical}$ variable, and describes where the X-ray was physically performed. There are 13 rooms identified from the data
+
+We will fit a first-order linear regression model on the response variable, propose valid models and do inference on them.
+
 # 2. Data Description and Pre-treatment
 
 ```{r data description}
-#setwd('C:/Users/Saunak/OneDrive - Texas Tech University/Work/TTU/Coursework/Spring 2022/Stat Data Analysis')
-setwd("G:/OneDrive - Texas Tech University/IE 5344 Statistical Data Analysis/Project")
+setwd('C:/Users/Saunak Panda/OneDrive - Texas Tech University/Work/TTU/Coursework/Spring 2022/Stat Data Analysis')
+#setwd("G:/OneDrive - Texas Tech University/IE 5344 Statistical Data Analysis/Project")
 dat <- read.csv("RadDat_5344.csv", header=TRUE)
 head(dat)
 str(dat)
 ```
-Since the data provided to us is not in the most usable form for regression, we perform data pre-treatment. Here, we convert the data types from character variables to categorical variables. Also, the binary variable, "In.Rad.Room" is also converted to a categorical variable with two levels.
 
-Finally, after converting all the variables to the appropriate form, we shall now decide which of the variables are going to be predictor variables. Setting the "Ordered.to.Complete...Mins" as response variable ($y$) and all other variables except "Unique.Identifier" shall be set as predictor variables ($x_1,x_2,\dotso,x_9$). We shall then bind these variables into a data frame (dat_clean).  
+Since the data provided to us is not in the most usable form for regression, we perform data pre-treatment.
+Here, we convert the data types from character variables to categorical variables.
+Also, the binary variable, "In.Rad.Room" is also converted to a categorical variable with two levels.
+
+Finally, after converting all the variables to the appropriate form, we shall now decide which of the variables are going to be predictor variables.
+Setting the "Ordered.to.Complete...Mins" as response variable ($y$) and all other variables except "Unique.Identifier" shall be set as predictor variables ($x_1,x_2,\dotso,x_9$).
+We shall then bind these variables into a data frame (dat_clean).
 
 ```{r data conversion, echo=TRUE}
 # Converting the variables to correct types
@@ -61,12 +68,13 @@ dat_clean <- cbind(dat$Ordered.to.Complete...Mins,as.data.frame(x1))
 head(dat_clean)
 colnames(dat_clean) <- c("y","x1","x2","x3","x4","x5","x6","x7","x8","x9")
 ```
-Having converted the data and having set the variables into a data frame, we are ready to build our basic model. 
+
+Having converted the data and having set the variables into a data frame, we are ready to build our basic model.
 
 # 3. Model Adequacy for Basic Model
 
-Before model selection, we first build our first-order basic model:
-$\hat{y} = \beta_0 + \beta_1 x_1 + \beta_2 x_2 + \beta_3 x_3 + \beta_4 x_4 + \beta_5 x_5 + \beta_6 x_6 + \beta_7 x_7 + \beta_8 x_8 + \beta_9 x_9$.
+Before model selection, we first build our first-order basic model: $\hat{y} = \beta_0 + \beta_1 x_1 + \beta_2 x_2 + \beta_3 x_3 + \beta_4 x_4 + \beta_5 x_5 + \beta_6 x_6 + \beta_7 x_7 + \beta_8 x_8 + \beta_9 x_9$.
+
 ```{r adequacy , echo=TRUE,fig.width = 3.5, fig.height=3.5}
 # Fit basic model
 fit1 <- lm(y~.,dat_clean)
@@ -79,36 +87,47 @@ fit1 <- lm(y~.,dat_clean)
 From A1 in Appendix, $x_4$ is removed for multicollinearity.
 
 Figure 1.
+
 ```{r adequacyfig1 , echo=TRUE,fig.width = 3.5, fig.height=3.5}
 plot(fit1,1) # Residuals vs Fitted
 ```
 
-As shown in Figure 1, there is an outward - opening funnel pattern which implies that the variance is increasing with $y$. This indicates the non-constant variance. 
+As shown in Figure 1, there is an outward - opening funnel pattern which implies that the variance is increasing with $y$.
+This indicates the non-constant variance.
 
 Figure 2.
+
 ```{r adequacy2 , echo=TRUE,fig.width = 3.5, fig.height=3.5}
 plot(fit1,2) # Normal Q-Q
 ```
-From Figure 2, we can observe a positive skew, which implies the non-normality. 
+
+From Figure 2, we can observe a positive skew, which implies the non-normality.
 
 Figure 3.
+
 ```{r adequacy3 , echo=TRUE,fig.width = 3.5, fig.height=3.5}
 plot(fit1,3) # Standardized Residuals vs Fitted
 ```
-Besides, we can observe a large amount of outliers from Figure 3 whose studentized residuals are greater than 3. Therefore, from these three diagonistic figures, our basic model doesn't have model adequacy. So, we need to do Boxcox transformation on the response variable: $y' = y^\lambda$. Then, we need to check for the model adequacy for the new model.
 
-# 3.1 Boxcox Transformation
+Besides, we can observe a large amount of outliers from Figure 3 whose studentized residuals are greater than 3.
+Therefore, from these three diagonistic figures, our basic model doesn't satisfy model adequacy.
+So, we need to perform a Boxcox transformation on the response variable: $y' = y^\lambda$.
+Then, we need to check for model adequacy for the transformed model.
 
-To determine the value of $\lambda$, we first draw the figure of $Log-likelihood$ with $\lambda$. 
+To determine the value of $\lambda$, we first draw the figure of $Log-likelihood$ with $\lambda$.
 
 Figure 4.
+
 ```{r transform, echo=TRUE, fig.width = 3.5, fig.height=3.5}
 # Checking if the model needs a boxcox transformation
 library(MASS)
 boxcox(fit1)
 ```
 
-However, the 95% interval of the maximum of $Log-likelihood$ is too small to approximate the $\lambda$. Since $\lambda = 0$ and $\lambda = 1$ don't belong to this interval, we can directly choose $\lambda = \arg \min Log-likelihood$, which is around $-0.2222$. Therefore, the new response variable $y' = y^{-0.2222}$. We regress on this $y'$ and then check for its model adequacy.
+However, the 95% interval of the maximum of $Log-likelihood$ is too small to approximate the $\lambda$.
+Since $\lambda = 0$ and $\lambda = 1$ don't belong to this interval, we can directly choose $\lambda = \arg \min Log-likelihood$, which is around $-0.2222$.
+Therefore, the new response variable $y' = y^{-0.2222}$.
+We regress on this $y'$ and then check for its model adequacy.
 
 ```{r transform1, echo=TRUE, fig.width = 3.5, fig.height=3.5}
 # Checking if the model needs a boxcox transformation
@@ -125,44 +144,60 @@ fit2 <- lm(y~., dat_clean)
 ```
 
 Figure 5.
-```{r transform11, echo=TRUE, fig.width = 3.5, fig.height=3.5}
+
+```{r transform111, echo=TRUE, fig.width = 3.5, fig.height=3.5}
 plot(fit2,1) # Residuals vs Fitted
 ```
-As shown in Figure 5, there is almost no pattern which implies constant variance. 
+
+As shown in Figure 5, there is almost no pattern which implies constant variance.
 
 Figure 6.
-```{r transform12, echo=TRUE, fig.width = 3.5, fig.height=3.5}
+
+```{r transform121, echo=TRUE, fig.width = 3.5, fig.height=3.5}
 plot(fit2,2) # Normal Q-Q
 ```
+
 From Figure 2, we can observe a slightly positive skew but it still can be regarded as a straight line, which implies the normality.
 
 Figure 7.
-```{r transform13, echo=TRUE, fig.width = 3.5, fig.height=3.5}
+
+```{r transform131, echo=TRUE, fig.width = 3.5, fig.height=3.5}
 plot(fit2,3) # Standardized Residuals vs Fitted
-``` 
-Also, we still can observe a large amount of outliers from Figure 7 whose studentized residuals are greater than 3. Therefore, from these three diagonistic figures, our basic model doesn't have model adequacy. Since we have done the Boxcox transformation on the response variable $y$, we need to detect if there are outlier, leverage or influential points.
+```
+
+Also, we still can observe a large amount of outliers from Figure 7 whose studentized residuals are greater than 3.
+Therefore, from these three diagonistic figures, our basic model doesn't have model adequacy.
+Since we have done the Boxcox transformation on the response variable $y$, we need to detect if there are outlier, leverage or influential points.
 
 Figure 8.
-```{r influential, echo=TRUE, fig.width = 3.5, fig.height=3.5}
+
+```{r fig41, echo=TRUE, fig.width = 3.5, fig.height=3.5}
 # Check for outliers, leverage points and influential points
 plot(fit2,4)
 ```
+
 From Figure 8, we can observe that the maximum of Cook's distance of these observations is less than 1, which implies that there is no influential points.
 
 Figure 9.
-```{r leverage, echo=TRUE, fig.width = 3.5, fig.height=3.5}
+
+```{r fig51, echo=TRUE, fig.width = 3.5, fig.height=3.5}
 # Check for outliers, leverage points and influential points
 plot(fit2,5)
 ```
 
-Figure 10. 
-```{r influential, echo=TRUE, fig.width = 3.5, fig.height=3.5}
+Figure 10.
+
+```{r fig61, echo=TRUE, fig.width = 3.5, fig.height=3.5}
 # Check for outliers, leverage points and influential points
 plot(fit2,6)
 ```
-From Figure 9 and the alarm reported from R, we can determine that No. 43343, No. 33632, No. 15151, No. 3399, No. 6739, No. 10219, No. 20037, No. 20147, No. 21326, No. 23275, No. 23696, No. 24750, No. 34141, No. 35528, No. 36860, and No. 37290 are leverage points. 
 
-To determine outliers, we define a function, as shown below. The result shows that there are 486 outliers among observations. Since we don't know whether they are due to misrecording, we just remove all those outliers. Then, there are 43037 observation left.
+From Figure 9 and the alarm reported from R, we can determine that No. 43343, No. 33632, No. 15151, No. 3399, No. 6739, No. 10219, No. 20037, No. 20147, No. 21326, No. 23275, No. 23696, No. 24750, No. 34141, No. 35528, No. 36860, and No. 37290 are leverage points.
+
+To determine outliers, we define a function, as shown below.
+The result shows that there are 486 outliers among observations.
+Since we don't know whether they are due to misrecording, we just remove all those outliers.
+Then, there are 43037 observation left.
 
 ```{r outliers, echo=TRUE, fig.width = 3.5, fig.height=3.5}
 # Check for outliers, leverage points and influential points
@@ -174,132 +209,179 @@ residfcn<-function(model){
 resid <- as.data.frame(residfcn(fit2))
 resid <- resid[-c(3399, 6739, 10219, 20037, 20147, 21326, 23275, 23696, 24750, 34141, 35528, 36860, 37290),]
 outliers <- resid[resid$resid > 3, ]
+# The number of outliers
 dim(outliers)
 rest <- resid[resid$resid <= 3,]
 index <- c(rest[,1])
 data_clean <- dat_clean[index,]
+# Total number of observations after removing outliers
 dim(data_clean)
 ```
 
 So, we fit a new model regarding the new data set.
+
 ```{r datanew , echo=TRUE,fig.width = 3.5, fig.height=3.5}
 fit3 <- lm(y ~., data_clean)
 ```
 
-
 Figure 11.
-```{r transform11, echo=TRUE, fig.width = 3.5, fig.height=3.5}
+
+```{r transform112, echo=TRUE, fig.width = 3.5, fig.height=3.5}
 plot(fit3,1) # Residuals vs Fitted
 ```
-As shown in Figure 11, there is almost no pattern which implies constant variance. 
+
+As shown in Figure 11, there is almost no pattern which implies constant variance.
 
 Figure 12.
-```{r transform12, echo=TRUE, fig.width = 3.5, fig.height=3.5}
+
+```{r transform122, echo=TRUE, fig.width = 3.5, fig.height=3.5}
 plot(fit3,2) # Normal Q-Q
 ```
+
 From Figure 12, it still can be regarded as a straight line, which implies the normality.
 
 Figure 13.
-```{r transform13, echo=TRUE, fig.width = 3.5, fig.height=3.5}
+
+```{r transform132, echo=TRUE, fig.width = 3.5, fig.height=3.5}
 plot(fit3,3) # Standardized Residuals vs Fitted
-``` 
-Now, from Figure 13, there are no outliers because their absolute value of studentized residuals are less than 2.25. Therefore, this new model has the model adequacy. Taking this model as our new basic model, we can do the inference.
+```
+
+Now, from Figure 13, there are no outliers because their absolute value of studentized residuals are less than 2.25.
+Therefore, this new model has the model adequacy.
+Taking this model as our new basic model, we can do the inference.
 
 # 4. Inference on Basic Model
 
-In this section, we will use different methods to do model selection based on our basic model. First, we will use ANOVA to determine which is the best model and then, explain the best model. Second, we will use AIC to determine the best model and then explain it. At last, we compare the best models selected by these two methods and give our comments.
+In this section, we will use different methods to do model selection based on our basic model.
+First, we will use ANOVA to determine which is the best model and then, explain the best model.
+Second, we will use AIC to determine the best model and then explain it.
+Finally, we refine the best models based on interpretability, and then give our comments on these models.
 
 ## 4.1 ANOVA
 
-ANOVA is applied for model selection in this section. First, we test if all the predictor variables don't contribute significantly. 
+ANOVA is applied for model selection in this section.
+First, we test if all the predictor variables don't contribute significantly.
 
 Table 1.
+
 ```{r anova , echo=TRUE,fig.width = 3.5, fig.height=3.5}
 fit3_all <- lm(y ~1, data_clean)
 anova(fit3_all, fit3)
 # p-value < 0.05, so H0 is rejected, so we conclude that at least one of these predictors contributes significantly.
 ```
-From Table 1, we can observe that $p-$value is less than 0.05, which means that we can reject the null hypothesis. This implies that at least one of predictor variables contributes significantly. Then, we test the predictor variables one by one to determine the best model.
+
+From Table 1, we can observe that $p-$value is less than 0.05, which means that we can reject the null hypothesis.
+This implies that at least one of predictor variables contributes significantly.
+Then, we test the predictor variables one by one to determine the best model.
 
 Here, we test for $x_1$.
 Table 2.
+
 ```{r anova1 , echo=TRUE,fig.width = 3.5, fig.height=3.5}
 fit3_1 <- lm(y ~. - x1, data_clean)
 anova(fit3_1, fit3)
 # don't drop x1 because p-value < 0.05, so H0 is rejected.
 ```
-From Table 2, we can see that the $p-$value is less than 0.05, which means that we can reject the null hypothesis. Therefore, we keep $x_1$ in the model.
+
+From Table 2, we can see that the $p-$value is less than 0.05, which means that we can reject the null hypothesis.
+Therefore, we keep $x_1$ in the model.
 
 Here, we test for $x_2$.
 Table 3.
+
 ```{r anova2 , echo=TRUE,fig.width = 3.5, fig.height=3.5}
 fit3_2 <- lm(y ~. - x2, data_clean)
 anova(fit3_2, fit3)
 # don't drop x2 because p-value < 0.05, so H0 is rejected.
 ```
-From Table 3, we can see that the $p-$value is less than 0.05, which means that we can reject the null hypothesis. Therefore, we keep $x_2$ in the model.
+
+From Table 3, we can see that the $p-$value is less than 0.05, which means that we can reject the null hypothesis.
+Therefore, we keep $x_2$ in the model.
 
 Here, we test for $x_3$.
 Table 4.
+
 ```{r anova3 , echo=TRUE,fig.width = 3.5, fig.height=3.5}
 fit3_3 <- lm(y ~. - x3, data_clean)
 anova(fit3_3, fit3)
 # don't drop x3 because p-value < 0.05, so H0 is rejected.
 ```
-From Table 4, we can see that the $p-$value is less than 0.05, which means that we can reject the null hypothesis. Therefore, we keep $x_3$ in the model.
+
+From Table 4, we can see that the $p-$value is less than 0.05, which means that we can reject the null hypothesis.
+Therefore, we keep $x_3$ in the model.
 
 Here, we test for $x_5$.
 Table 5.
+
 ```{r anova5 , echo=TRUE,fig.width = 3.5, fig.height=3.5}
 fit3_5 <- lm(y ~. - x5, data_clean)
 anova(fit3_5, fit3)
 # don't drop x5 because p-value < 0.05, so H0 is rejected.
 ```
-From Table 5, we can see that the $p-$value is less than 0.05, which means that we can reject the null hypothesis. Therefore, we keep $x_5$ in the model.
+
+From Table 5, we can see that the $p-$value is less than 0.05, which means that we can reject the null hypothesis.
+Therefore, we keep $x_5$ in the model.
 
 Here, we test for $x_6$.
 Table 6.
+
 ```{r anova6 , echo=TRUE,fig.width = 3.5, fig.height=3.5}
 fit3_6 <- lm(y ~. - x6, data_clean)
 anova(fit3_6, fit3)
 # don't drop x6 because p-value < 0.05, so H0 is rejected.
 ```
-From Table 6, we can see that the $p-$value is less than 0.05, which means that we can reject the null hypothesis. Therefore, we keep $x_6$ in the model.
+
+From Table 6, we can see that the $p-$value is less than 0.05, which means that we can reject the null hypothesis.
+Therefore, we keep $x_6$ in the model.
 
 Here, we test for $x_7$.
 Table 7.
+
 ```{r anova7 , echo=TRUE,fig.width = 3.5, fig.height=3.5}
 fit3_7 <- lm(y ~. - x7, data_clean)
 anova(fit3_7, fit3)
 # don't drop x7 because p-value < 0.05, so H0 is rejected.
 ```
-From Table 7, we can see that the $p-$value is less than 0.05, which means that we can reject the null hypothesis. Therefore, we keep $x_7$ in the model.
+
+From Table 7, we can see that the $p-$value is less than 0.05, which means that we can reject the null hypothesis.
+Therefore, we keep $x_7$ in the model.
 
 Here, we test for $x_8$.
 Table 8.
+
 ```{r anova8 , echo=TRUE,fig.width = 3.5, fig.height=3.5}
 fit3_8 <- lm(y ~. - x8, data_clean)
 anova(fit3_8, fit3)
 # don't drop x8 because p-value < 0.05, so H0 is rejected.
 ```
-From Table 8, we can see that the $p-$value is less than 0.05, which means that we can reject the null hypothesis. Therefore, we keep $x_8$ in the model.
+
+From Table 8, we can see that the $p-$value is less than 0.05, which means that we can reject the null hypothesis.
+Therefore, we keep $x_8$ in the model.
 
 Here, we test for $x_9$.
 Table 9.
+
 ```{r anova9 , echo=TRUE,fig.width = 3.5, fig.height=3.5}
 fit3_9 <- lm(y ~. - x9, data_clean)
 anova(fit3_9, fit3)
 # don't drop x9 because p-value < 0.05, so H0 is rejected.
 ```
-From Table 9, we can see that the $p-$value is less than 0.05, which means that we can reject the null hypothesis. Therefore, we keep $x_9$ in the model.
 
-Therefore, our basic model is the best model selected by ANOVA. From A2 in Appendix, we observe that the whole model is significant because $p-$value for this model is less than 0.05. The adjusted $R^2$ is 0.574, which implies that 57.4% of variance can be explained by this model.
+From Table 9, we can see that the $p-$value is less than 0.05, which means that we can reject the null hypothesis.
+Therefore, we keep $x_9$ in the model.
+
+Therefore, our basic model is the best model selected by ANOVA.
+From A2 in Appendix, we observe that the whole model is significant because $p-$value for this model is less than 0.05.
+The adjusted $R^2$ is 0.574, which implies that 57.4% of variance can be explained by this model.
 
 ## 4.2 Step-wise Regression (AIC)
-We apply AIC to determine the best in this section. 
+
+We apply AIC to determine the best in this section.
 
 ### 4.2.1 Forward Direction
+
 First, we choose forward direction.
+
 ```{r forward step, echo=TRUE}
 # Build a basic model regressing y on 1.
 fit4_1 <- lm(y~1,data_clean)
@@ -307,9 +389,11 @@ formula(fit4_1)
 # Perform a forward step-wise regression
 Ford <- step(fit4_1, scope~x1+x2+x3+x5+x6+x7+x8+x9,direction = "forward")
 ```
+
 Best model considering AIC when performing step-wise regression in forward direction is $y'=\beta_0 + \beta_1x_1 + \beta_2 x_2+\beta_3 x_3+\beta_5 x_5+\beta_6 x_6+\beta_7 x_7 +\beta_8 x_8 +\beta_9 x_9$ because it has the least AIC value, which is the same model selected by ANOVA.
 
 ### 4.2.2 Backward Direction
+
 Now, we shall perform a backward step-wise regression to check what model we get.
 
 ```{r backward step, echo=TRUE}
@@ -320,34 +404,66 @@ formula(fit4_2)
 Backward <- step(fit4_2,direction = "backward")
 ```
 
-We observe that with the backward step-wise regression, we again obtain the same best model with the least AIC value. 
+We observe that with the backward step-wise regression, we again obtain the same best model with the least AIC value.
 
 ### 4.2.3 Both Directions
 
 We shall finally verify if we get the same model with step-wise regression in both directions simultaneously.
+
 ```{r both step, echo=TRUE}
 # Build a basic model regressing y on all the variables.
 fit4_3 <- lm(y~.,data_clean)
 formula(fit4_3)
 # Perform step-wise regression in both directions
-Both <- step(fit3_3, scope~x1+x2+x3+x5+x6+x7+x8+x9,direction = "both")
+Both <- step(fit4_3, scope~x1+x2+x3+x5+x6+x7+x8+x9,direction = "both")
 ```
 
 With this approach as well, we observe that the best model selected is same as the one obtained from the previous two directions.
 
-Therefore, the best model selected is $y' = y^{-0.2222}=\beta_0 + \beta_1x_1 + \beta_2 x_2+\beta_3 x_3+\beta_5 x_5+\beta_6 x_6+\beta_7 x_7 +\beta_8 x_8 +\beta_9 x_9$.
+Therefore, the best model selected by the methods is $y' = y^{-0.2222}=\beta_0 + \beta_1x_1 + \beta_2 x_2+\beta_3 x_3+\beta_5 x_5+\beta_6 x_6+\beta_7 x_7 +\beta_8 x_8 +\beta_9 x_9$.
 
-# Recommendations
-To shorten the time taken to receive an ordered X-Ray, we expected a greater value of $y'$
+## 4.3 Model Refinement
+
+So, from the above analyses we see that the best model obtained is $y' = y^{-0.2222}=\beta_0 + \beta_1x_1 + \beta_2 x_2+\beta_3 x_3+\beta_5 x_5+\beta_6 x_6+\beta_7 x_7 +\beta_8 x_8 +\beta_9 x_9$. However, we cannot logically justify the effect of the variable $x_2$ on $y'$, since $x_2$ is a unique ID of each radiology technician. MOreover, the variables $x_2$ and $x_3$ are not very significant. Hence, we wanted to see the effect of removing these two variable on the performance of the model.
+
+```{r reduced_model, echo=TRUE}
+reduced_fit = lm(y~.-x2-x3,data_clean)
+```
+We observe that the R-squared value of the reduced model $y' = y^{-0.2222}=\beta_0 + \beta_1x_1 +\beta_5 x_5+\beta_6 x_6+\beta_7 x_7 +\beta_8 x_8 +\beta_9 x_9$ is around 0.53 which is slightly lower than the R-squared of the best model which is around 0.5762, while the significance of both the models is comparable.
+
+# 5. Recommendations
+
+From our analysis, our recommendation to the Care One Hospital is that there are some factors which do not significantly affect the time taken to receive an ordered X-Ray. These are:
+  1. The ID of the patient (i.e. Unique.Identifier)
+  2. The location of the room where the scan was performed (i.e. In.Rad.Room)
+
+Moreover, on further analysis, we found that the unique ID of radiology technician and the type of X-ray performed do not have a very significant effect on the time take to receive an ordered X-ray. So, to consider these two factors would be up-to the discretion of the Hospital. Finally, from our analysis, we find that the below factors have the most effect on the time take to receive an ordered X-ray:
+
+  1. Age of the patient (i.e. PatientAge)
+  2. Type of patient (i.e. PatientType)
+  3. Whether the scan is Routine or STAT (i.e. Priority)
+  4. Location of the patient in the hospital where the order was completed (i.e. Loc.At.Exam.Complete)
+  5. The shifts of the radiology technicians/ time when the exam was completed (i.e. Exam.Completed.Bucket)
+  6. The location where the X-ray was performed (i.e. Exam.Room)
+
+\newpage
 
 # Appendix
 
 ## A1
+
 ```{r A1, echo=TRUE}
 summary(fit1)
 ```
 
 ## A2
+
 ```{r A2, echo=TRUE}
 summary(fit3)
+```
+
+## A3
+
+```{r A3, eco=TRUE}
+summary(reduced_fit)
 ```
